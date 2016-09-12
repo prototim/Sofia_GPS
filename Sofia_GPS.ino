@@ -1,3 +1,4 @@
+//updated
 #include <TinyGPS++.h>
 //#include <SoftwareSerial.h>         //not available on ARM Feather M0
 #include <SPI.h>
@@ -13,7 +14,7 @@ Uart Serial2 (&sercom1, 11, 10, SERCOM_RX_PAD_0, UART_TX_PAD_2);
  
 void SERCOM1_Handler()
 {
-  Ser ial2.IrqHandler();
+  Serial2.IrqHandler();
 }
 
 //**********************************************
@@ -72,7 +73,7 @@ void setup()
 {
   Serial.begin(115200);
   Serial2.begin(GPSBaud);
-
+pinMode(13, OUTPUT);
   
   // Assign pins 10 & 11 SERCOM functionality
   pinPeripheral(10, PIO_SERCOM);
@@ -100,12 +101,18 @@ Serial.println(TinyGPSPlus::libraryVersion());
       break;
     }
   }
+
+   logfile = SD.open(filename, FILE_WRITE);
+  if( ! logfile ) {
+    Serial.print("Couldnt create "); 
+    Serial.println(filename);
+    error(3);
+  }
+
+  pinMode(13, OUTPUT);
+  pinMode(8, OUTPUT);
+  
 //********************************************
-
-
-
-
-
   
 }
 
