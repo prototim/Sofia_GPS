@@ -1,3 +1,14 @@
+
+#include <SPI.h>
+#include <SD.h>
+
+//#include <TinyGPS>
+
+
+//SoftwareSerial geigerSerial(2, 3); //rx, tx
+String burst;
+float gpsDataArray[] = {0,0,0,0,0,0}; // date, time, lat, long, speed, alt
+
 //updated
 #include <TinyGPS++.h>
 //#include <SoftwareSerial.h>         //not available on ARM Feather M0
@@ -52,11 +63,12 @@ static const int RXPin = 11, TXPin = 10;
 //9600 for 20U7
 static const uint32_t GPSBaud = 9600;
 String Location;
-String Lat;
-String Long;
-String Time;
-String Speed;
-String Altitude;
+float Date;
+float Lat;
+float Long;
+float Time;
+float Speed;
+float Altitude;
 String GPSLOG;
 String Comma;
 
@@ -92,7 +104,7 @@ Serial.println(TinyGPSPlus::libraryVersion());
     error(2);
   }
   char filename[15];
-  strcpy(filename, "GPSLOG00.TXT");
+  strcpy(filename, "sofLog00.TXT");
   for (uint8_t i = 0; i < 100; i++) {
     filename[6] = '0' + i/10;
     filename[7] = '0' + i%10;
@@ -136,18 +148,35 @@ void loop()
     //Serial.print(gps.location.rawLng().deg);
     //Serial.print("[+");
     //Serial.print(gps.location.rawLng().billionths);
+    
+    
+    Lat = gps.location.lat();
+    gpsDataArray[2] = Lat;
+    
+    Long = gps.location.lng();
+    gpsDataArray[3] = Long;
+    
+    
     Serial.print(F(" billionths],  Lat="));
-    Serial.print(gps.location.lat(), 6);
-    Serial.print(F(" Long="));
+    Serial.print(Lat);
+    Serial.print(F(" billionths],  Long="));
+    Serial.print(Long);
     Serial.println(gps.location.lng(), 6);
   }
 
   else if (gps.date.isUpdated())
   {
-    Serial.print(F("DATE       Fix Age="));
-    Serial.print(gps.date.age());
-    Serial.print(F("ms Raw="));
-    Serial.println(gps.date.value());
+    
+    Date = gps.date.value();
+    gpsDataArray[0] = Date;
+    Serial.print("RAW DATE ");
+    Serial.println(Time);
+    
+//    Serial.print(F("DATE       Fix Age="));
+    
+//    Serial.print(gps.date.age());
+//    Serial.print(F("ms Raw="));
+//    Serial.println(gps.date.value());
 //    Serial.print(F(" Year="));
 //    Serial.print(gps.date.year());
 //    Serial.print(F(" Month="));
@@ -155,13 +184,19 @@ void loop()
 //    Serial.print(F(" Day="));
 //    Serial.println(gps.date.day());
   }
-/*
+
   else if (gps.time.isUpdated())
   {
     Serial.print(F("TIME       Fix Age="));
     Serial.print(gps.time.age());
+
+    Time = gps.time.value();
+    gpsDataArray[1] = Time;
+
+
     Serial.print(F("ms Raw="));
-//    Serial.print(gps.time.value());
+    Serial.print(gps.time.value());
+    
 //    Serial.print(F(" Hour="));
 //    Serial.print(gps.time.hour());
 //    Serial.print(F(" Minute="));
@@ -171,7 +206,7 @@ void loop()
 //    Serial.print(F(" Hundredths="));
 //    Serial.println(gps.time.centisecond());
   }
-*/
+
   else if (gps.speed.isUpdated())
   {
     Serial.print(F("SPEED      Fix Age="));
@@ -182,8 +217,13 @@ void loop()
 //    Serial.print(gps.speed.knots());
 //    Serial.print(F(" MPH="));
 //    Serial.print(gps.speed.mph());
+
+    Speed = gps.speed.mps();
+    gpsDataArray[4] = Speed;
+    
     Serial.print(F(" m/s="));
-    Serial.println(gps.speed.mps());
+    Serial.println(Speed);
+//    Serial.println(gps.speed.mps());
 //    Serial.print(F(" km/h="));
 //    Serial.println(gps.speed.kmph());
   }
@@ -200,17 +240,24 @@ void loop()
     Serial.print(F(" Deg="));
     Serial.println(gps.course.deg());
   }
-
 */  
 
   else if (gps.altitude.isUpdated())
   {
-    Serial.print(F("ALTITUDE   Fix Age="));
+    //Serial.print(F("ALTITUDE   Fix Age="));
     //Serial.print(gps.altitude.age());
     //Serial.print(F("ms Raw="));
     //Serial.print(gps.altitude.value());
-    Serial.print(F(" Meters="));
-    Serial.println(gps.altitude.meters());
+
+
+    Altitude = gps.altitude.meters();
+    gpsDataArray[5] = Altitude;
+    
+    Serial.print("Meters=");
+    Serial.println(Altitude);
+
+    
+    //Serial.println(gps.altitude.meters());
     //Serial.print(F(" Miles="));
     //Serial.print(gps.altitude.miles());
     //Serial.print(F(" KM="));
@@ -219,21 +266,21 @@ void loop()
     //Serial.println(gps.altitude.feet());
   }
 
-  else if (gps.satellites.isUpdated())
-  {
-    Serial.print(F("SATELLITES Fix Age="));
-    Serial.print(gps.satellites.age());
-    Serial.print(F("ms Value="));
-    Serial.println(gps.satellites.value());
-  }
+//  else if (gps.satellites.isUpdated())
+//  {
+//    Serial.print(F("SATELLITES Fix Age="));
+//    Serial.print(gps.satellites.age());
+//    Serial.print(F("ms Value="));
+//    Serial.println(gps.satellites.value());
+//  }
 
-  else if (gps.hdop.isUpdated())
-  {
-    Serial.print(F("HDOP       Fix Age="));
-    Serial.print(gps.hdop.age());
-    Serial.print(F("ms Value="));
-    Serial.println(gps.hdop.value());
-  }
+//  else if (gps.hdop.isUpdated())
+//  {
+//    Serial.print(F("HDOP       Fix Age="));
+//    Serial.print(gps.hdop.age());
+//    Serial.print(F("ms Value="));
+//    Serial.println(gps.hdop.value());
+//  }
 
 
   else if (millis() - last > 5000)
@@ -254,7 +301,6 @@ void loop()
           gps.location.lng(),
           LONDON_LAT, 
           LONDON_LON);
-
       Serial.print(F("LONDON     Distance="));
       Serial.print(distanceToLondon/1000, 6);
       Serial.print(F(" km Course-to="));
@@ -264,19 +310,78 @@ void loop()
       Serial.println(F("]"));
     }
 */
-    Serial.print(F("DIAGS      Chars="));
-    Serial.print(gps.charsProcessed());
-    Serial.print(F(" Sentences-with-Fix="));
-    Serial.print(gps.sentencesWithFix());
-    Serial.print(F(" Failed-checksum="));
-    Serial.print(gps.failedChecksum());
-    Serial.print(F(" Passed-checksum="));
-    Serial.println(gps.passedChecksum());
+//    Serial.print(F("DIAGS      Chars="));
+//    Serial.print(gps.charsProcessed());
+//    Serial.print(F(" Sentences-with-Fix="));
+//    Serial.print(gps.sentencesWithFix());
+//    Serial.print(F(" Failed-checksum="));
+//    Serial.print(gps.failedChecksum());
+//    Serial.print(F(" Passed-checksum="));
+//    Serial.println(gps.passedChecksum());
 
     if (gps.charsProcessed() < 10)
       Serial.println(F("WARNING: No GPS data.  Check wiring."));
 
     last = millis();
     Serial.println();
+
   }
+
+  //writeSD(gpsDataArray);
+
+  digitalWrite(8, HIGH);
+  logfile.print(gpsDataArray[0]);
+  logfile.print(", ");
+  logfile.print(gpsDataArray[1]);
+  logfile.print(", ");
+  logfile.print(gpsDataArray[2]);
+  logfile.print(", ");
+  logfile.print(gpsDataArray[3]);
+  logfile.print(", ");
+  logfile.println(gpsDataArray[4]);
+  logfile.print(", ");
+  logfile.println(gpsDataArray[5]);
+  digitalWrite(8, LOW);
+
+  logfile.flush();
 }
+
+void writeSD(float gpsvals[]) {
+  // in this loop we will write to the SD card
+  digitalWrite(8, HIGH);
+  logfile.print(gpsvals[0]);
+  logfile.print(", ");
+  logfile.print(gpsvals[1]);
+  logfile.print(", ");
+  logfile.print(gpsvals[2]);
+  logfile.print(", ");
+  logfile.print(gpsvals[3]);
+  logfile.print(", ");
+  logfile.println(gpsvals[4]);
+  logfile.print(", ");
+  logfile.println(gpsvals[5]);
+  digitalWrite(8, LOW);
+
+  logfile.flush();
+
+  exit;
+}
+
+void readGPS() {
+  // in this loop we will read the GPS and send it to the log
+  // it is probably best if we keep it persistant in a variable
+  // based on TinyGPS++
+
+}
+
+void readIMU() {
+  // read the Arduino 101 IMU
+
+}
+
+void pollGeigerCounter() {
+  // poll the Geiger Counter for changes >> Use as interrupt to trigger a event read?
+
+}
+
+
