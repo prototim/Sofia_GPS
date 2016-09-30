@@ -160,8 +160,8 @@ void loop()
     Serial.print("Lat= ");
     Serial.print(Lat, 6);
     Serial.print("Long= ");
-    Serial.print(Long);
-    Serial.println(gps.location.lng(), 6);
+    Serial.print(Long, 6);
+    //Serial.println(gps.location.lng(), 6);
   }
 
   else if (gps.date.isUpdated())
@@ -331,9 +331,9 @@ void loop()
   logfile.print(", ");
   logfile.print(gpsDataArray[1]);
   logfile.print(", ");
-  logfile.print(gpsDataArray[2]);
+  logfile.print(gpsDataArray[2], 6);
   logfile.print(", ");
-  logfile.print(gpsDataArray[3]);
+  logfile.print(gpsDataArray[3], 6);
   logfile.print(", ");
   logfile.print(gpsDataArray[4]);
   logfile.print(", ");
@@ -417,9 +417,9 @@ void writeSD(float gpsvals[]) {
   logfile.print(", ");
   logfile.print(gpsvals[1]);
   logfile.print(", ");
-  logfile.print(gpsvals[2]);
+  logfile.print(gpsvals[2], 6);
   logfile.print(", ");
-  logfile.print(gpsvals[3]);
+  logfile.print(gpsvals[3], 6);
   logfile.print(", ");
   logfile.print(gpsvals[4]);
   logfile.print(", ");
