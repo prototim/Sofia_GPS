@@ -7,7 +7,7 @@
 
 //SoftwareSerial geigerSerial(2, 3); //rx, tx
 String burst;
-float gpsDataArray[] = {0,0,0,0,0,0}; // date, time, lat, long, speed, alt
+float gpsDataArray[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // date, time, lat, long, speed, alt
 
 //updated
 #include <TinyGPS++.h>
@@ -136,7 +136,7 @@ void loop()
 
   if (gps.location.isUpdated())
   {
-    Serial.print(F("LOCATION   Fix Age="));
+    //Serial.print(F("LOCATION   Fix Age="));
     //Serial.print(gps.location.age());
     //Serial.print(F("ms Raw Lat="));
     //Serial.print(gps.location.rawLat().negative ? "-" : "+");
@@ -150,16 +150,16 @@ void loop()
     //Serial.print(gps.location.rawLng().billionths);
     
     
-    Lat = gps.location.lat();
+    Lat = (float) gps.location.lat();
     gpsDataArray[2] = Lat;
     
-    Long = gps.location.lng();
+    Long = (float) gps.location.lng();
     gpsDataArray[3] = Long;
     
     
-    Serial.print(F(" billionths],  Lat="));
-    Serial.print(Lat);
-    Serial.print(F(" billionths],  Long="));
+    Serial.print("Lat= ");
+    Serial.print(Lat, 6);
+    Serial.print("Long= ");
     Serial.print(Long);
     Serial.println(gps.location.lng(), 6);
   }
@@ -170,7 +170,7 @@ void loop()
     Date = gps.date.value();
     gpsDataArray[0] = Date;
     Serial.print("RAW DATE ");
-    Serial.println(Time);
+    Serial.println(Date);
     
 //    Serial.print(F("DATE       Fix Age="));
     
@@ -187,15 +187,16 @@ void loop()
 
   else if (gps.time.isUpdated())
   {
-    Serial.print(F("TIME       Fix Age="));
-    Serial.print(gps.time.age());
+    //Serial.print(F("TIME       Fix Age="));
+//    Serial.print(gps.time.age());
 
     Time = gps.time.value();
     gpsDataArray[1] = Time;
 
 
-    Serial.print(F("ms Raw="));
-    Serial.print(gps.time.value());
+    Serial.print("Raw time= ");
+    //Serial.print(gps.time.value());
+    Serial.println(Time);
     
 //    Serial.print(F(" Hour="));
 //    Serial.print(gps.time.hour());
@@ -209,7 +210,7 @@ void loop()
 
   else if (gps.speed.isUpdated())
   {
-    Serial.print(F("SPEED      Fix Age="));
+//    Serial.print(F("SPEED      Fix Age="));
 //    Serial.print(gps.speed.age());
 //    Serial.print(F("ms Raw="));
 //    Serial.print(gps.speed.value());
@@ -221,7 +222,7 @@ void loop()
     Speed = gps.speed.mps();
     gpsDataArray[4] = Speed;
     
-    Serial.print(F(" m/s="));
+    Serial.print("m/s= ");
     Serial.println(Speed);
 //    Serial.println(gps.speed.mps());
 //    Serial.print(F(" km/h="));
@@ -253,7 +254,7 @@ void loop()
     Altitude = gps.altitude.meters();
     gpsDataArray[5] = Altitude;
     
-    Serial.print("Meters=");
+    Serial.print("Meters= ");
     Serial.println(Altitude);
 
     
@@ -283,7 +284,7 @@ void loop()
 //  }
 
 
-  else if (millis() - last > 5000)
+  else if (millis() - last > 500)
   {
     Serial.println();
 /*    if (gps.location.isValid())
@@ -322,13 +323,9 @@ void loop()
     if (gps.charsProcessed() < 10)
       Serial.println(F("WARNING: No GPS data.  Check wiring."));
 
-    last = millis();
-    Serial.println();
 
-  }
 
-  //writeSD(gpsDataArray);
-
+      
   digitalWrite(8, HIGH);
   logfile.print(gpsDataArray[0]);
   logfile.print(", ");
@@ -338,15 +335,82 @@ void loop()
   logfile.print(", ");
   logfile.print(gpsDataArray[3]);
   logfile.print(", ");
-  logfile.println(gpsDataArray[4]);
+  logfile.print(gpsDataArray[4]);
   logfile.print(", ");
   logfile.println(gpsDataArray[5]);
   digitalWrite(8, LOW);
-
   logfile.flush();
+
+ // writeSD(gpsDataArray);
+
+  
+    last = millis();
+    Serial.println();
+
+//  digitalWrite(8, HIGH);
+//  logfile.print(gpsDataArray[0]);
+//  logfile.print(", ");
+//  logfile.print(gpsDataArray[1]);
+//  logfile.print(", ");
+//  logfile.print(gpsDataArray[2]);
+//  logfile.print(", ");
+//  logfile.print(gpsDataArray[3]);
+//  logfile.print(", ");
+//  logfile.println(gpsDataArray[4]);
+//  logfile.print(", ");
+//  logfile.println(gpsDataArray[5]);
+//  digitalWrite(8, LOW);
+
+  }
+
+//
+//  digitalWrite(8, HIGH);
+//  logfile.print(gpsDataArray[0]);
+//  logfile.print(", ");
+//  logfile.print(gpsDataArray[1]);
+//  logfile.print(", ");
+//  logfile.print(gpsDataArray[2]);
+//  logfile.print(", ");
+//  logfile.print(gpsDataArray[3]);
+//  logfile.print(", ");
+//  logfile.println(gpsDataArray[4]);
+//  logfile.print(", ");
+//  logfile.println(gpsDataArray[5]);
+//  digitalWrite(8, LOW);
+//
+//  logfile.flush();
+
+//  digitalWrite(8, HIGH);
+//  Serial.println("begin");
+//  Serial.println(gpsDataArray[0]);
+//  Serial.println(gpsDataArray[1]);
+//  Serial.println(gpsDataArray[2]);
+//  Serial.println(gpsDataArray[3]);
+//  Serial.println(gpsDataArray[4]);
+//  Serial.println(gpsDataArray[5]);
+//  Serial.println("end");
+//  digitalWrite(8, LOW);
+//
+//  logfile.flush();
+
 }
 
 void writeSD(float gpsvals[]) {
+
+  //debug
+//  digitalWrite(8, HIGH);
+//  Serial.println("begin");
+//  Serial.println(gpsvals[0]);
+//  Serial.println(gpsvals[1]);
+//  Serial.println(gpsvals[2]);
+//  Serial.println(gpsvals[3]);
+//  Serial.println(gpsvals[4]);
+//  Serial.println(gpsvals[5]);
+//  Serial.println("end");
+//  digitalWrite(8, LOW);
+
+
+  
   // in this loop we will write to the SD card
   digitalWrite(8, HIGH);
   logfile.print(gpsvals[0]);
@@ -357,12 +421,14 @@ void writeSD(float gpsvals[]) {
   logfile.print(", ");
   logfile.print(gpsvals[3]);
   logfile.print(", ");
-  logfile.println(gpsvals[4]);
+  logfile.print(gpsvals[4]);
   logfile.print(", ");
   logfile.println(gpsvals[5]);
   digitalWrite(8, LOW);
 
   logfile.flush();
+  
+  //gpsvals[] = [,,,,,];
 
   exit;
 }
