@@ -147,7 +147,7 @@ Serial.println(TinyGPSPlus::libraryVersion());
   logfile.print(", ");
   logfile.print("Altitude");
   logfile.print(", ");
-  logfile.println("Geiger CPS");
+  logfile.println("Geiger CPS, counts, CPM, counts, uSv/hr, value, SLOW");
 
 
 
@@ -165,22 +165,14 @@ void loop()
 //      geigerCPS += 1;
 //  }
 
+
+
   if(Serial1.available() > 0)
     {
-//      if(Serial1.read() == '\n')
-//      {
-        geigerCounterString = Serial1.read();
- //       Serial.println(geigerCounterString);
-        Serial.println(Serial1.parseInt());  
-//        
-        //Serial.println(Serial1.parseInt());  
-        //Serial.println(Serial1.parseInt());  
-        //Serial.println(Serial1.parseInt());  
-        //Serial.println(Serial1.parseInt());  
-        //Serial.println(Serial1.parseInt());  
-//      }
+        geigerCounterString = Serial1.readStringUntil('\n');
+        //Serial.println(geigerCounterString);
     }
-
+    
   // Read incoming characters from the GPS serial output
   while (Serial2.available() > 0)
     gps.encode(Serial2.read());
@@ -224,7 +216,9 @@ void loop()
   {
 
     
-    //Serial.println(Serial3.read());
+
+    
+    Serial.println();
     
     Serial.print("RAW DATE = ");
     Serial.println(Date);
@@ -243,10 +237,9 @@ void loop()
     
     Serial.print("Meters= ");
     Serial.println(Altitude);
-
     
     Serial.print("CPS = ");
-    Serial.println(geigerCPS);
+    Serial.println(geigerCounterString);
 
     if (gps.charsProcessed() < 10)
       Serial.println(F("WARNING: No GPS data.  Check wiring."));
@@ -265,7 +258,7 @@ void loop()
     logfile.print(", ");
     logfile.print(gpsDataArray[5]);
     logfile.print(", ");
-    logfile.println(geigerCPS);
+    logfile.println(geigerCounterString);
     digitalWrite(8, LOW);
     logfile.flush();
 
